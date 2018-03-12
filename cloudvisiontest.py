@@ -2,6 +2,8 @@ import io
 import os
 from flask import Flask, request, jsonify
 import base64
+import glob
+import random
 # Imports the Google Cloud client library
 from google.cloud import vision
 from google.cloud.vision import types
@@ -15,19 +17,41 @@ def hello():
 
 @app.route('/image', methods = ['GET','POST'])
 def img_upload():
-    imgfile = request.files['sfimage'].read()
+    imgfile = request.files['image'].read()
     image = types.Image(content=imgfile)
     gcv_response = client.label_detection(image=image)
     labels = gcv_response.label_annotations
     response_dictionary = {}
     for label in labels:
-        print label.score
-        print label.description
         tag = label.description
-        tag2 ='hello'
         response_dictionary[tag] = label.score
-        response_dictionary[tag2] = label.description
-        return jsonify(response_dictionary)
+    bestfoldermatch = get_match(response_dictionary)
+    response = {'message':'Is this '+bestfoldermatch+'?'}
+    random_image = get_random_image(bestfoldermatch)
+    response['image'] = random_image
+    # return jsonify(response_dictionary)
+    print response_dictionary
+    return jsonify(response)
+
+def get_random_image(foldername):
+    images = glob.glob('./pictures/'+foldername+'/*.jpg')
+    image_path = random.choice(images)
+    image_string = convert_img(image_path)
+    return image_string
+
+def get_match(tags_dict):
+    folder_names = {'pizza':'pizza',
+                    'dog':'dog',
+                    'candy':'candy',
+                    'hot dog':'hot dog',
+                    'cat':'cat',
+                    'french fries':'fries',
+                    'junk food':'chips'}
+    for key in tags_dict:
+        percent_accuracy = tags_dict[key]*100
+        if percent_accuracy > 80 and key in folder_names:
+            return folder_names[key]
+
 def convert_img(img_path):
     with open(img_path, "rb") as imageFile:
         str = base64.b64encode(imageFile.read())
