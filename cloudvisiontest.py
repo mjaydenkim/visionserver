@@ -92,4 +92,4 @@ print(dir(last_label))
 #if prop in dir(label)
 #if prop in label
 if __name__ == '__main__':
-    app.run()
+    app.run(host= '0.0.0.0')
