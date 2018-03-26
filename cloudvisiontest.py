@@ -1,6 +1,6 @@
 import io
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import base64
 import glob
 import random
@@ -9,14 +9,25 @@ from google.cloud import vision
 from google.cloud.vision import types
 
 app = Flask(__name__)
-client = vision.ImageAnnotatorClient()
-@app.route('/')
-def hello():
-    print(request.args['yatit'])
-    return 'Helklo woroldsd'
 
-@app.route('/image', methods = ['GET','POST'])
+client = vision.ImageAnnotatorClient()
+@app.route('/', methods = ['GET'])
+def hello():
+    template = """
+    <form method="POST">
+    <input type="file" name="image"/>
+    </form>
+    """
+    return render_template('index.html')
+
+@app.route('/', methods = ['POST'])
 def img_upload():
+    try:
+        print(request.get('image'))
+        print(request.args('image'))
+        print(request.form('image'))
+    except:
+        print('your code sucks :(')
     imgfile = request.files['image'].read()
     image = types.Image(content=imgfile)
     gcv_response = client.label_detection(image=image)
@@ -25,13 +36,20 @@ def img_upload():
     for label in labels:
         tag = label.description
         response_dictionary[tag] = label.score
+    img_keywords = [label.description for label in labels]
     bestfoldermatch = get_match(response_dictionary)
-    response = {'message':'Is this '+bestfoldermatch+'?'}
-    random_image = get_random_image(bestfoldermatch)
-    response['image'] = random_image
+    if(bestfoldermatch is None):
+        message = 'Image cannot be categorized :(<br/> Here are some relevant keywords for your image:<br/>'
+        message += ' | '.join(img_keywords)
+    else:
+        message = 'Is this '+bestfoldermatch+'?'
+    response = {'message':message}
+    #random_image = get_random_image(bestfoldermatch)
+    #response['image'] = random_image
     # return jsonify(response_dictionary)
     print response_dictionary
-    return jsonify(response)
+#    return jsonify(response)
+    return render_template('response.html',message=response['message'])
 
 def get_random_image(foldername):
     images = glob.glob('./pictures/'+foldername+'/*.jpg')
