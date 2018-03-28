@@ -39,7 +39,7 @@ def img_upload():
     img_keywords = [label.description for label in labels]
     bestfoldermatch = get_match(response_dictionary)
     if(bestfoldermatch is None):
-        message = 'Image cannot be categorized :(<br/> Here are some relevant keywords for your image:<br/>'
+        message = 'Here are some relevant keywords for your image:<br/>'
         message += ' | '.join(img_keywords)
     else:
         message = 'Is this '+bestfoldermatch+'?'
