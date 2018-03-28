@@ -4,6 +4,6 @@ The post went live at 11:38 PM on July 16, and a mere 20 minutes later, the Burg
 
 
 
-okay. im sorry. here's the actual readme
+okay. im sorry. here's the actual readme <br>
 Hello! This is my STEM project. Upload a picture of anything (don't forget to submit) and this server will process the pictures with the help of Google's Cloud Vision API. It will check for one of these 7 categories- (not)hotdog, candy, cat, chips, fries, pizza, or dogs. If Google's API returns less than 80 percent accuracy for all of these topics, it will switch to general labels for the image provided. Thanks for visiting my booth, and feel free to try out the website.
-Go to 138.68.30.41:5000 to try out the website!
+Go to http://138.68.30.41:5000 to try out the website!
